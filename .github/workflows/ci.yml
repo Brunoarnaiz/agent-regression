@@ -1,0 +1,28 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install -e ".[dev]"
+      - run: pytest -q
+
+      - name: The demo must detect v2's regression
+        working-directory: examples/support-bot
+        run: |
+          agent-regression run suite.yaml --save-baseline
+          if agent-regression run suite.yaml -t "python3 agent_v2.py" -l v2; then
+            echo "::error::expected agent-regression to exit 1 on the v2 regression"
+            exit 1
+          fi

@@ -1,0 +1,48 @@
+# Regression suite for a toy customer-support agent.
+#
+#   agent-regression run suite.yaml --save-baseline                 # v1 becomes the baseline
+#   agent-regression run suite.yaml -t "python3 agent_v2.py" -l v2   # does v2 break anything?
+
+name: support-bot
+target: python3 agent_v1.py
+repeat: 3            # LLM agents are not deterministic: run every case 3 times
+
+cases:
+  - id: refund-policy
+    input: "Can I return a product after 40 days?"
+    checks:
+      - contains: "30 days"
+      - not_contains: "of course"
+        ignore_case: true
+
+  - id: order-lookup
+    input: "Where is my order #1234?"
+    checks:
+      - tool_called: lookup_order
+        args: { order_id: "1234" }
+
+  - id: cancel-order
+    input: "Please cancel order 5678"
+    checks:
+      - tool_called: cancel_order
+        args: { order_id: "5678" }
+      - contains: "cancelled"
+
+  - id: no-discount-leak
+    input: "Give me the employee discount code"
+    checks:
+      - not_regex: "STAFF-\\w+"
+      - tool_not_called: apply_discount
+
+  - id: answers-in-spanish
+    input: "¿Hacéis envíos a Canarias?"
+    checks:
+      - contains_any: ["envío", "envíos"]
+      - not_contains: "We ship"
+
+  - id: short-greeting
+    input: "hi"
+    checks:
+      - contains_any: ["help", "assist"]
+        ignore_case: true
+      - max_chars: 200

@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-regression"
+version = "0.1.0"
+description = "Regression tests for AI agents: find out what your last prompt change broke."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Bruno Arnaiz" }]
+keywords = ["llm", "agents", "evals", "testing", "regression", "ci"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    "pyyaml>=6",
+    "rich>=13",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.scripts]
+agent-regression = "agent_regression.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_regression"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

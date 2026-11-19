@@ -1,0 +1,12 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+.pytest_cache/
+
+# Local run history of agent-regression (in your own projects you would
+# usually commit baseline.json and ignore runs/)
+.agent-regression/
