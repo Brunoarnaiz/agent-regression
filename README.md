@@ -2,7 +2,7 @@
 
 **Regression tests for AI agents.** Change a prompt, a model or a tool, and find out what you broke before your users do.
 
-![agent-regression catching a regression in the support-bot demo](docs/demo.svg)
+![agent-regression catching a regression in the support-bot demo](docs/demo.png)
 
 LLM agents fail quietly. You tweak the prompt to fix one answer and a case that worked yesterday stops working. Nothing crashes, so nobody notices. Unit tests don't fit outputs that change on every run, and full eval platforms are a lot of setup for "did I just break something?".
 
@@ -28,13 +28,17 @@ agent-regression run suite.yaml --save-baseline                  # v1 becomes th
 agent-regression run suite.yaml -t "python3 agent_v2.py" -l v2   # what did v2 break?
 ```
 
-`examples/support-bot` is a toy customer-support agent (no LLM, so the demo is free and deterministic). Version 2 adds a shipping FAQ. It fixes the Spanish replies… and silently stops looking up orders. That's the screenshot above.
+`examples/support-bot` is a toy customer-support agent (no LLM, so the demo is free and deterministic). Version 2 adds a shipping FAQ. It fixes the Spanish replies… and silently stops looking up orders. That's the screenshot above: the first run saves v1 as the baseline, known failure included (v1 sometimes drifts into English), and the second compares v2 against it.
 
 ## With a real model
 
-`examples/claude-agent` is the same kind of support agent running on Claude, with real tool use and a Claude Haiku judge. Prompt v2 tries to make the agent cheaper by telling it to avoid tools:
+`examples/claude-agent` is the same kind of support agent running on Claude, with real tool use and a Claude Haiku judge. With prompt v1, all five cases pass:
 
-![agent-regression catching a prompt regression on Claude](docs/claude-agent.svg)
+![prompt v1 on Claude: all five cases pass](docs/claude-v1.png)
+
+Prompt v2 tries to make the agent cheaper by telling it to avoid tools:
+
+![agent-regression catching a prompt regression on Claude](docs/claude-v2.png)
 
 The v2 agent replied *"I can't check live order status here, but orders usually arrive within 3-5 business days…"*, even though it had a `lookup_order` tool. A polite, plausible answer, and a broken feature. Only the `tool_called` check caught it.
 
